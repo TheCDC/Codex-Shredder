@@ -10,7 +10,6 @@
 		"query-string": "^5.0.0",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.46.4",
-		"react-native-autocomplete-input": "github:l-urence/react-native-autocomplete-input",
 		"react-native-hyperlink": "0.0.10"
 	},
 	"devDependencies": {
