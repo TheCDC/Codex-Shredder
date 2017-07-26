@@ -58,11 +58,11 @@ class CardSearch extends Component {
   }
   render() {
     return (
-      <View>
+      <View style={{ flex: 1 }}>
 
         <TextInput
           onChangeText={text => this.query(text)}
-          placeholder="Card name"
+          placeholder="Search for a card"
         />
         {this.state.loaded
           ? <SearchResults response={this.state.response} />
@@ -91,39 +91,37 @@ class SearchResults extends Component {
       );
     }
     return (
-      <View>
-        <ScrollView>
-          <Text style={styles.instructions}>
-            {this.props.response.similar_cards.map((card, index) => (
-              <Text key={index}>
-                <Text>
-                  {card.name} | {card.type} | {card.manaCost} {"\n"}
-                </Text>
-                <Text>
-                  {card.text}|
-                  {card.power ? <Text>{card.power}/{card.toughness}</Text> : ""}
-
-                </Text>
-                <Text
-                  style={{ color: "blue" }}
-                  onPress={() =>
-                    Linking.openURL(
-                      "http://scryfall.com/search?" +
-                        queryString.stringify({ q: card.name })
-                    )}
-                >
-                  {"\n"}Scryfall
-                </Text>
-                <Text>
-                  {"\n\n"}
-                </Text>
+      <ScrollView>
+        <Text style={styles.instructions}>
+          {this.props.response.similar_cards.map((card, index) => (
+            <Text key={index}>
+              <Text>
+                {card.name} | {card.type} | {card.manaCost} {"\n"}
               </Text>
-            ))}
+              <Text>
+                {card.text}
+                {card.power ? <Text>|{card.power}/{card.toughness}</Text> : ""}
 
-          </Text>
+              </Text>
+              <Text
+                style={{ color: "blue" }}
+                onPress={() =>
+                  Linking.openURL(
+                    "http://scryfall.com/search?" +
+                      queryString.stringify({ q: card.name })
+                  )}
+              >
+                {"\n"}Scryfall
+              </Text>
+              <Text>
+                {"\n\n"}
+              </Text>
+            </Text>
+          ))}
 
-        </ScrollView>
-      </View>
+        </Text>
+
+      </ScrollView>
     );
   }
 }
