@@ -16,7 +16,6 @@ import {
 } from "react-native";
 
 const queryString = require("query-string");
-
 class CardSearch extends Component {
   _getAllCards() {
     fetch(
@@ -92,34 +91,34 @@ class SearchResults extends Component {
     }
     return (
       <ScrollView>
-        <Text style={styles.instructions}>
+        <Text>
+          Tap a card to search on Scryfall.
+        </Text>
+        <View>
           {this.props.response.similar_cards.map((card, index) => (
-            <Text key={index}>
-              <Text>
-                {card.name} | {card.type} | {card.manaCost} {"\n"}
-              </Text>
-              <Text>
-                {card.text}
-                {card.power ? <Text>|{card.power}/{card.toughness}</Text> : ""}
-
-              </Text>
+            <View key={index} style={styles.cardCard}>
               <Text
-                style={{ color: "blue" }}
                 onPress={() =>
                   Linking.openURL(
                     "http://scryfall.com/search?" +
                       queryString.stringify({ q: card.name })
                   )}
               >
-                {"\n"}Scryfall
+                <Text style={[styles.cardText]}>
+                  {card.name} | {card.type} | {card.manaCost} {"\n"}
+                </Text>
+                <Text style={[styles.cardTextBody, styles.cardText]}>
+                  {card.text}
+                  {card.power
+                    ? <Text>|{card.power}/{card.toughness}</Text>
+                    : ""}
+
+                </Text>
               </Text>
-              <Text>
-                {"\n\n"}
-              </Text>
-            </Text>
+            </View>
           ))}
 
-        </Text>
+        </View>
 
       </ScrollView>
     );
@@ -150,6 +149,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 5
+  },
+  cardCard: {
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: "#000000",
+    margin: 3,
+    backgroundColor: "#FFFFFF",
+    padding: 1
+  },
+  cardText: {
+    color: "#000000"
+  },
+  cardTextBody: {
+    margin: 1,
+    padding: 1
   }
 });
 
