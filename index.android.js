@@ -21,6 +21,18 @@ function scryfallLink(cardName) {
 }
 
 const queryString = require("query-string");
+
+class Banner extends Component {
+  render () {
+    return (
+      <View>
+      <Text style={styles.welcome}>
+      Codex Shredder v0.1
+      </Text>
+      </View>
+      );
+  }
+}
 class CardSearch extends Component {
   _getAllCards() {
     fetch(
@@ -45,10 +57,6 @@ class CardSearch extends Component {
     this._getAllCards();
   }
   query(targetName) {
-    this.setState({ searchQuery: targetName });
-    let params = { card: targetName };
-    let qs = queryString.stringify(params);
-    let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
     // filter card names containing the query
     var foundMatches = this.state.cardList.filter(function(cardName) {
       const a = cardName.toLowerCase();
@@ -56,6 +64,8 @@ class CardSearch extends Component {
       return a.indexOf(b) !== -1;
       // console.error(a + "|" + b);
     });
+
+    // sort auto complete results
     foundMatches.sort(function(card1, card2) {
       let c1 = card1.toLowerCase();
       let c2 = card2.toLowerCase();
@@ -65,6 +75,14 @@ class CardSearch extends Component {
       return a.length / c2.length - a.length / c1.length;
     });
     this.setState({ matchingCards: foundMatches });
+
+    let finalName = targetName;
+
+    this.setState({ searchQuery: finalName });
+
+    let params = { card: finalName };
+    let qs = queryString.stringify(params);
+    let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
 
     fetch(targetUrl)
       .then(response => response.json())
@@ -79,13 +97,19 @@ class CardSearch extends Component {
         console.error(error);
       });
   }
-  getQuery() {
-    return this.state.searchQuery;
-  }
   render() {
+    if (this.state.cardList.length === 0) {
+      return (
+        <View>
+          <Banner/>
+          <Text> Fetching card names...</Text>
+        </View>
+      );
+    }
     return (
       <View style={{ flex: 1 }}>
         <ScrollView keyboardShouldPersistTaps={"always"}>
+          <Banner/>
           <TextInput
             onChangeText={text => this.query(text)}
             placeholder="Search for a card"
@@ -94,9 +118,9 @@ class CardSearch extends Component {
 
           <View>
             <Text>
-              Matches
+              Suggestions
             </Text>
-            {this.getQuery().length > 0
+            {this.state.searchQuery.length > 0
               ? this.state.matchingCards.slice(0, 10).map((cardName, index) => (
                   <Text
                     key={index}
@@ -140,7 +164,7 @@ class CardCard extends Component {
           </Text>
           <Text style={[styles.cardTextBody, styles.cardText]}>
             {card.text}
-            {card.power ? <Text>|{card.power}/{card.toughness}</Text> : ""}
+            {card.power ? <Text> | {card.power}/{card.toughness}</Text> : ""}
 
           </Text>
         </Text>
