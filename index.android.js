@@ -15,6 +15,10 @@ import {
   Linking
 } from "react-native";
 
+function scryfallLink(cardName) {
+  return "http://scryfall.com/search?" + queryString.stringify({ q: cardName });
+}
+
 const queryString = require("query-string");
 class CardSearch extends Component {
   _getAllCards() {
@@ -24,6 +28,7 @@ class CardSearch extends Component {
       .then(response => response.text())
       .then(text => {
         this.setState({ cardList: text.split("\n") });
+        console.error(text);
       })
       .catch(error => {
         console.error(error);
@@ -31,13 +36,26 @@ class CardSearch extends Component {
   }
   constructor(props) {
     super(props);
-    this.state = { searchQuery: "lightning bolt", loaded: false };
+    this.state = {
+      searchQuery: "lightning bolt",
+      loaded: false,
+      matchingCards: [],
+      cardList: []
+    };
     this._getAllCards();
   }
-  query(name) {
-    let params = { card: name };
-    var qs = queryString.stringify(params);
-    var targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
+  query(targetName) {
+    let params = { card: targetName };
+    let qs = queryString.stringify(params);
+    let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
+    // filter card names containing the query
+    let foundMatches = this.state.cardList.filter(function(cardName) {
+      const a = cardName.toLowerCase();
+      const b = targetName.toLowerCase();
+      return a.indexOf(b) !== -1;
+      // console.error(a + "|" + b);
+    });
+    this.setState({ matchingCards: foundMatches });
 
     fetch(targetUrl)
       .then(response => response.json())
@@ -58,14 +76,32 @@ class CardSearch extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
+        <ScrollView>
+          <TextInput
+            onChangeText={text => this.query(text)}
+            placeholder="Search for a card"
+          />
 
-        <TextInput
-          onChangeText={text => this.query(text)}
-          placeholder="Search for a card"
-        />
-        {this.state.loaded
-          ? <SearchResults response={this.state.response} />
-          : <Text />}
+          <View>
+            <Text>
+              Matches
+            </Text>
+            {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
+              <Text
+                key={index}
+                onPress={() => this.query(cardName)}
+                style={styles.cardCompleteSuggestion}
+              >
+                {cardName}
+              </Text>
+            ))}
+
+          </View>
+
+          {this.state.loaded
+            ? <SearchResults response={this.state.response} />
+            : <Text />}
+        </ScrollView>
       </View>
     );
   }
@@ -77,6 +113,7 @@ class SearchResults extends Component {
   }
   render() {
     // this.state  = {responseText: "loading"};
+    const target_card = this.props.response.target_card;
     if (
       this.props.response.similar_cards == null ||
       this.props.response.similar_cards === undefined
@@ -90,20 +127,43 @@ class SearchResults extends Component {
       );
     }
     return (
-      <ScrollView>
+      <View>
         <Text>
-          Tap a card to search on Scryfall.
+          Your search
+        </Text>
+        <View style={[styles.cardCard, styles.searchedCard]}>
+          <Text onPress={() => Linking.openURL(scryfallLink(target_card.name))}>
+
+            <Text style={styles.cardText}>
+              {target_card.name}
+              {" "}
+              |
+              {" "}
+              {target_card.type}
+              {" "}
+              |
+              {" "}
+              {target_card.manaCost}
+              {" "}
+              {"\n"}
+            </Text>
+            <Text style={[styles.cardTextBody, styles.cardText]}>
+              {target_card.text}
+              {target_card.power
+                ? <Text>|{target_card.power}/{target_card.toughness}</Text>
+                : ""}
+
+            </Text>
+          </Text>
+        </View>
+
+        <Text>
+          Tap a card to view on Scryfall.
         </Text>
         <View>
           {this.props.response.similar_cards.map((card, index) => (
             <View key={index} style={styles.cardCard}>
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    "http://scryfall.com/search?" +
-                      queryString.stringify({ q: card.name })
-                  )}
-              >
+              <Text onPress={() => Linking.openURL(scryfallLink(card.name))}>
                 <Text style={[styles.cardText]}>
                   {card.name} | {card.type} | {card.manaCost} {"\n"}
                 </Text>
@@ -119,8 +179,7 @@ class SearchResults extends Component {
           ))}
 
         </View>
-
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -164,6 +223,18 @@ const styles = StyleSheet.create({
   cardTextBody: {
     margin: 1,
     padding: 1
+  },
+  cardCompleteSuggestion: {
+    backgroundColor: "#AAAAFF",
+    borderWidth: 1,
+    borderRadius: 7,
+    borderColor: "#AAAAFF",
+    color: "#000000",
+    margin: 1,
+    padding: 3
+  },
+  searchedCard: {
+    backgroundColor: "wheat"
   }
 });
 
