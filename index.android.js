@@ -15,6 +15,10 @@ import {
   Linking
 } from "react-native";
 
+function scryfallLink(cardName) {
+  return "http://scryfall.com/search?" + queryString.stringify({ q: cardName });
+}
+
 const queryString = require("query-string");
 class CardSearch extends Component {
   _getAllCards() {
@@ -72,28 +76,32 @@ class CardSearch extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-      <ScrollView>
-        <TextInput
-          onChangeText={text => this.query(text)}
-          placeholder="Search for a card"
-        />
+        <ScrollView>
+          <TextInput
+            onChangeText={text => this.query(text)}
+            placeholder="Search for a card"
+          />
 
-        <View>
-          <Text>
-            Matches
-          </Text>
-          {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
-            <Text key={index} onPress={() => this.query(cardName)} style={styles.cardCompleteSuggestion}>
-              {cardName}
+          <View>
+            <Text>
+              Matches
             </Text>
-          ))}
+            {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
+              <Text
+                key={index}
+                onPress={() => this.query(cardName)}
+                style={styles.cardCompleteSuggestion}
+              >
+                {cardName}
+              </Text>
+            ))}
 
-        </View>
+          </View>
 
-        {this.state.loaded
-          ? <SearchResults response={this.state.response} />
-          : <Text />}
-      </ScrollView>
+          {this.state.loaded
+            ? <SearchResults response={this.state.response} />
+            : <Text />}
+        </ScrollView>
       </View>
     );
   }
@@ -121,22 +129,33 @@ class SearchResults extends Component {
     return (
       <View>
         <Text>
-        Your search
+          Your search
         </Text>
-        <View style={styles.cardCard}>
+        <View style={[styles.cardCard, styles.searchedCard]}>
+          <Text onPress={() => Linking.openURL(scryfallLink(target_card.name))}>
 
-        <Text style={[styles.cardText]}>
-          {target_card.name} | {target_card.type} | {target_card.manaCost} {"\n"}
-        </Text>
-        <Text style={[styles.cardTextBody, styles.cardText]}>
-          {target_card.text}
-          {target_card.power
-            ? <Text>|{target_card.power}/{target_card.toughness}</Text>
-            : ""}
+            <Text style={styles.cardText}>
+              {target_card.name}
+              {" "}
+              |
+              {" "}
+              {target_card.type}
+              {" "}
+              |
+              {" "}
+              {target_card.manaCost}
+              {" "}
+              {"\n"}
+            </Text>
+            <Text style={[styles.cardTextBody, styles.cardText]}>
+              {target_card.text}
+              {target_card.power
+                ? <Text>|{target_card.power}/{target_card.toughness}</Text>
+                : ""}
 
-        </Text>
+            </Text>
+          </Text>
         </View>
-
 
         <Text>
           Tap a card to view on Scryfall.
@@ -144,13 +163,7 @@ class SearchResults extends Component {
         <View>
           {this.props.response.similar_cards.map((card, index) => (
             <View key={index} style={styles.cardCard}>
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    "http://scryfall.com/search?" +
-                      queryString.stringify({ q: card.name })
-                  )}
-              >
+              <Text onPress={() => Linking.openURL(scryfallLink(card.name))}>
                 <Text style={[styles.cardText]}>
                   {card.name} | {card.type} | {card.manaCost} {"\n"}
                 </Text>
@@ -167,7 +180,6 @@ class SearchResults extends Component {
 
         </View>
       </View>
-
     );
   }
 }
@@ -219,7 +231,10 @@ const styles = StyleSheet.create({
     borderColor: "#AAAAFF",
     color: "#000000",
     margin: 1,
-    padding: 3,
+    padding: 3
+  },
+  searchedCard: {
+    backgroundColor: "wheat"
   }
 });
 
