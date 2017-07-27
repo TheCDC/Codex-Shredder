@@ -72,7 +72,7 @@ class CardSearch extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-
+      <ScrollView>
         <TextInput
           onChangeText={text => this.query(text)}
           placeholder="Search for a card"
@@ -82,9 +82,9 @@ class CardSearch extends Component {
           <Text>
             Matches
           </Text>
-          {this.state.matchingCards.slice(0, 10).map((card, index) => (
-            <Text key={index}>
-              {card}
+          {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
+            <Text key={index} onPress={() => this.query(cardName)} style={styles.cardCompleteSuggestion}>
+              {cardName}
             </Text>
           ))}
 
@@ -93,6 +93,7 @@ class CardSearch extends Component {
         {this.state.loaded
           ? <SearchResults response={this.state.response} />
           : <Text />}
+      </ScrollView>
       </View>
     );
   }
@@ -104,6 +105,7 @@ class SearchResults extends Component {
   }
   render() {
     // this.state  = {responseText: "loading"};
+    const target_card = this.props.response.target_card;
     if (
       this.props.response.similar_cards == null ||
       this.props.response.similar_cards === undefined
@@ -117,7 +119,25 @@ class SearchResults extends Component {
       );
     }
     return (
-      <ScrollView>
+      <View>
+        <Text>
+        Your search
+        </Text>
+        <View style={styles.cardCard}>
+
+        <Text style={[styles.cardText]}>
+          {target_card.name} | {target_card.type} | {target_card.manaCost} {"\n"}
+        </Text>
+        <Text style={[styles.cardTextBody, styles.cardText]}>
+          {target_card.text}
+          {target_card.power
+            ? <Text>|{target_card.power}/{target_card.toughness}</Text>
+            : ""}
+
+        </Text>
+        </View>
+
+
         <Text>
           Tap a card to view on Scryfall.
         </Text>
@@ -146,8 +166,8 @@ class SearchResults extends Component {
           ))}
 
         </View>
+      </View>
 
-      </ScrollView>
     );
   }
 }
@@ -191,6 +211,15 @@ const styles = StyleSheet.create({
   cardTextBody: {
     margin: 1,
     padding: 1
+  },
+  cardCompleteSuggestion: {
+    backgroundColor: "#AAAAFF",
+    borderWidth: 1,
+    borderRadius: 7,
+    borderColor: "#AAAAFF",
+    color: "#000000",
+    margin: 1,
+    padding: 3,
   }
 });
 
