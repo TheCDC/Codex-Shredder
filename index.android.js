@@ -12,7 +12,8 @@ import {
   View,
   ScrollView,
   TextInput,
-  Linking
+  Linking,
+  Keyboard
 } from "react-native";
 
 function scryfallLink(cardName) {
@@ -75,10 +76,11 @@ class CardSearch extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps={"always"}>
           <TextInput
             onChangeText={text => this.query(text)}
             placeholder="Search for a card"
+            onSubmitEditing={Keyboard.dismiss}
           />
 
           <View>
@@ -88,7 +90,10 @@ class CardSearch extends Component {
             {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
               <Text
                 key={index}
-                onPress={() => this.query(cardName)}
+                onPress={() => {
+                  this.query(cardName);
+                  Keyboard.dismiss();
+                }}
                 style={styles.cardCompleteSuggestion}
               >
                 {cardName}
@@ -157,9 +162,9 @@ class SearchResults extends Component {
         <Text>
           Your search
         </Text>
-        <View style={[ styles.searchedCard]}>
-        <CardCard card=target_card/>
-          
+        <View style={[styles.searchedCard]}>
+          <CardCard card={target_card} />
+
         </View>
 
         <Text>
@@ -206,7 +211,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000000",
     margin: 3,
-    backgroundColor: "#FFFFFF",
     padding: 1
   },
   cardText: {
