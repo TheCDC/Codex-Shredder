@@ -28,7 +28,6 @@ class CardSearch extends Component {
       .then(response => response.text())
       .then(text => {
         this.setState({ cardList: text.split("\n") });
-        console.error(text);
       })
       .catch(error => {
         console.error(error);
@@ -37,7 +36,7 @@ class CardSearch extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchQuery: "lightning bolt",
+      searchQuery: "",
       loaded: false,
       matchingCards: [],
       cardList: []
@@ -107,6 +106,33 @@ class CardSearch extends Component {
   }
 }
 
+class CardCard extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const card = this.props.card;
+    return (
+      <View style={styles.cardCard}>
+        <Text onPress={() => Linking.openURL(scryfallLink(card.name))}>
+          <Text style={[styles.cardText]}>
+            {card.name} | {card.manaCost}
+            {"\n"}
+            {card.type} | {card.set.code} ({card.set.name})
+            {"\n"}
+          </Text>
+          <Text style={[styles.cardTextBody, styles.cardText]}>
+            {card.text}
+            {card.power ? <Text>|{card.power}/{card.toughness}</Text> : ""}
+
+          </Text>
+        </Text>
+      </View>
+    );
+  }
+}
+
 class SearchResults extends Component {
   constructor(props) {
     super(props);
@@ -131,51 +157,17 @@ class SearchResults extends Component {
         <Text>
           Your search
         </Text>
-        <View style={[styles.cardCard, styles.searchedCard]}>
-          <Text onPress={() => Linking.openURL(scryfallLink(target_card.name))}>
-
-            <Text style={styles.cardText}>
-              {target_card.name}
-              {" "}
-              |
-              {" "}
-              {target_card.type}
-              {" "}
-              |
-              {" "}
-              {target_card.manaCost}
-              {" "}
-              {"\n"}
-            </Text>
-            <Text style={[styles.cardTextBody, styles.cardText]}>
-              {target_card.text}
-              {target_card.power
-                ? <Text>|{target_card.power}/{target_card.toughness}</Text>
-                : ""}
-
-            </Text>
-          </Text>
+        <View style={[ styles.searchedCard]}>
+        <CardCard card=target_card/>
+          
         </View>
 
         <Text>
           Tap a card to view on Scryfall.
         </Text>
         <View>
-          {this.props.response.similar_cards.map((card, index) => (
-            <View key={index} style={styles.cardCard}>
-              <Text onPress={() => Linking.openURL(scryfallLink(card.name))}>
-                <Text style={[styles.cardText]}>
-                  {card.name} | {card.type} | {card.manaCost} {"\n"}
-                </Text>
-                <Text style={[styles.cardTextBody, styles.cardText]}>
-                  {card.text}
-                  {card.power
-                    ? <Text>|{card.power}/{card.toughness}</Text>
-                    : ""}
-
-                </Text>
-              </Text>
-            </View>
+          {this.props.response.similar_cards.map((cardObj, index) => (
+            <CardCard card={cardObj} key={index} />
           ))}
 
         </View>
@@ -184,7 +176,7 @@ class SearchResults extends Component {
   }
 }
 
-export default class CardCodex extends Component {
+export default class CodexShredder extends Component {
   render() {
     return <CardSearch />;
   }
@@ -238,4 +230,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent("CardCodex", () => CardCodex);
+AppRegistry.registerComponent("CodexShredder", () => CodexShredder);

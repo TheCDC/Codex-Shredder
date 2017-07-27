@@ -12,7 +12,7 @@ import {
   View
 } from 'react-native';
 
-export default class CardCodex extends Component {
+export default class CodexShredder extends Component {
   render() {
     return (
       <View style={styles.container}>
@@ -50,4 +50,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('CardCodex', () => CardCodex);
+AppRegistry.registerComponent('CodexShredder', () => CodexShredder);

@@ -1,4 +1,4 @@
-package com.cardcodex;
+package com.codexshredder;
 
 import android.app.Application;
 
