@@ -45,6 +45,7 @@ class CardSearch extends Component {
     this._getAllCards();
   }
   query(targetName) {
+    this.setState({ searchQuery: targetName });
     let params = { card: targetName };
     let qs = queryString.stringify(params);
     let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
@@ -55,6 +56,7 @@ class CardSearch extends Component {
       return a.indexOf(b) !== -1;
       // console.error(a + "|" + b);
     });
+
     this.setState({ matchingCards: foundMatches });
 
     fetch(targetUrl)
@@ -87,18 +89,20 @@ class CardSearch extends Component {
             <Text>
               Matches
             </Text>
-            {this.state.matchingCards.slice(0, 10).map((cardName, index) => (
-              <Text
-                key={index}
-                onPress={() => {
-                  this.query(cardName);
-                  Keyboard.dismiss();
-                }}
-                style={styles.cardCompleteSuggestion}
-              >
-                {cardName}
-              </Text>
-            ))}
+            {this.getQuery().length > 0
+              ? this.state.matchingCards.slice(0, 10).map((cardName, index) => (
+                  <Text
+                    key={index}
+                    onPress={() => {
+                      this.query(cardName);
+                      Keyboard.dismiss();
+                    }}
+                    style={styles.cardCompleteSuggestion}
+                  >
+                    {" "}{cardName}{" "}
+                  </Text>
+                ))
+              : <Text />}
 
           </View>
 
