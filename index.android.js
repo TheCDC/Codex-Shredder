@@ -50,20 +50,19 @@ class CardSearch extends Component {
     let qs = queryString.stringify(params);
     let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
     // filter card names containing the query
-    let foundMatches = this.state.cardList.filter(function(cardName) {
+    var foundMatches = this.state.cardList.filter(function(cardName) {
       const a = cardName.toLowerCase();
       const b = targetName.toLowerCase();
       return a.indexOf(b) !== -1;
       // console.error(a + "|" + b);
     });
-    foundMatches.sort(function(cardName) {
-      let a = cardName.toLowerCase();
-      const b = targetName.toLowerCase();
-      if (a.length === 0) {
-        a += " ";
-      }
+    foundMatches.sort(function(card1, card2) {
+      let c1 = card1.toLowerCase();
+      let c2 = card2.toLowerCase();
 
-      return b.length / a.length;
+      const a = targetName.toLowerCase();
+      // give lower values to cards where the target is closer to their length
+      return a.length / c2.length - a.length / c1.length;
     });
     this.setState({ matchingCards: foundMatches });
 
@@ -107,7 +106,7 @@ class CardSearch extends Component {
                     }}
                     style={styles.cardCompleteSuggestion}
                   >
-                    {" "}{cardName}{" "}
+                    {" "} {cardName} {" "}
                   </Text>
                 ))
               : <Text />}
