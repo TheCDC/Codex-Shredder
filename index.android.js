@@ -56,7 +56,15 @@ class CardSearch extends Component {
       return a.indexOf(b) !== -1;
       // console.error(a + "|" + b);
     });
+    foundMatches.sort(function(cardName) {
+      let a = cardName.toLowerCase();
+      const b = targetName.toLowerCase();
+      if (a.length === 0) {
+        a += " ";
+      }
 
+      return b.length / a.length;
+    });
     this.setState({ matchingCards: foundMatches });
 
     fetch(targetUrl)
