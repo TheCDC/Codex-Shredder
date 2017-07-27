@@ -16,6 +16,8 @@ import {
   Keyboard
 } from "react-native";
 
+var cardsObj = require("./res/cards.json");
+
 function scryfallLink(cardName) {
   return "http://scryfall.com/search?" + queryString.stringify({ q: cardName });
 }
@@ -23,14 +25,14 @@ function scryfallLink(cardName) {
 const queryString = require("query-string");
 
 class Banner extends Component {
-  render () {
+  render() {
     return (
       <View>
-      <Text style={styles.welcome}>
-      Codex Shredder v0.1
-      </Text>
+        <Text style={styles.welcome}>
+          Codex Shredder v0.1
+        </Text>
       </View>
-      );
+    );
   }
 }
 class CardSearch extends Component {
@@ -52,7 +54,7 @@ class CardSearch extends Component {
       searchQuery: "",
       loaded: false,
       matchingCards: [],
-      cardList: []
+      cardList: cardsObj.cards
     };
     this._getAllCards();
   }
@@ -101,7 +103,7 @@ class CardSearch extends Component {
     if (this.state.cardList.length === 0) {
       return (
         <View>
-          <Banner/>
+          <Banner />
           <Text> Fetching card names...</Text>
         </View>
       );
@@ -109,7 +111,7 @@ class CardSearch extends Component {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView keyboardShouldPersistTaps={"always"}>
-          <Banner/>
+          <Banner />
           <TextInput
             onChangeText={text => this.query(text)}
             placeholder="Search for a card"
