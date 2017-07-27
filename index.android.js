@@ -24,6 +24,7 @@ class CardSearch extends Component {
       .then(response => response.text())
       .then(text => {
         this.setState({ cardList: text.split("\n") });
+        console.error(text);
       })
       .catch(error => {
         console.error(error);
@@ -31,13 +32,26 @@ class CardSearch extends Component {
   }
   constructor(props) {
     super(props);
-    this.state = { searchQuery: "lightning bolt", loaded: false };
+    this.state = {
+      searchQuery: "lightning bolt",
+      loaded: false,
+      matchingCards: [],
+      cardList: []
+    };
     this._getAllCards();
   }
-  query(name) {
-    let params = { card: name };
-    var qs = queryString.stringify(params);
-    var targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
+  query(targetName) {
+    let params = { card: targetName };
+    let qs = queryString.stringify(params);
+    let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
+    // filter card names containing the query
+    let foundMatches = this.state.cardList.filter(function(cardName) {
+      const a = cardName.toLowerCase();
+      const b = targetName.toLowerCase();
+      return a.indexOf(b) !== -1;
+      // console.error(a + "|" + b);
+    });
+    this.setState({ matchingCards: foundMatches });
 
     fetch(targetUrl)
       .then(response => response.json())
@@ -63,6 +77,19 @@ class CardSearch extends Component {
           onChangeText={text => this.query(text)}
           placeholder="Search for a card"
         />
+
+        <View>
+          <Text>
+            Matches
+          </Text>
+          {this.state.matchingCards.slice(0, 10).map((card, index) => (
+            <Text key={index}>
+              {card}
+            </Text>
+          ))}
+
+        </View>
+
         {this.state.loaded
           ? <SearchResults response={this.state.response} />
           : <Text />}
@@ -92,7 +119,7 @@ class SearchResults extends Component {
     return (
       <ScrollView>
         <Text>
-          Tap a card to search on Scryfall.
+          Tap a card to view on Scryfall.
         </Text>
         <View>
           {this.props.response.similar_cards.map((card, index) => (
