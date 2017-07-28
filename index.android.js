@@ -156,7 +156,7 @@ class CardCard extends Component {
   }
 
   copyCardDialog(card) {
-    Alert.alert("Copy/Paste " + card.name, "Copy full card name or full text", [
+    Alert.alert("Copy " + card.name, "Copy full card name or full text", [
       {
         text: "Name",
         onPress: () => {
