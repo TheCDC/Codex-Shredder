@@ -13,7 +13,9 @@ import {
   ScrollView,
   TextInput,
   Linking,
-  Keyboard
+  Keyboard,
+  Alert,
+  Clipboard
 } from "react-native";
 
 var cardsObj = require("./res/cards.json");
@@ -153,11 +155,41 @@ class CardCard extends Component {
     super(props);
   }
 
+  copyCardDialog(card) {
+    Alert.alert("Copy/Paste " + card.name, "Copy full card name or full text", [
+      {
+        text: "Name",
+        onPress: () => {
+          Clipboard.setString(card.name);
+        }
+      },
+      {
+        text: "Text",
+        onPress: () => {
+          Clipboard.setString(
+            [
+              card.name,
+              card.manaCost,
+              card.type,
+              card.set.code + "(" + card.set.name + ")",
+              card.text,
+              card.power ? card.power + "/" + card.toughness : "",
+              card.loyalty
+            ].join("\n")
+          );
+        }
+      }
+    ]);
+  }
+
   render() {
     const card = this.props.card;
     return (
       <View style={styles.cardCard}>
-        <Text onPress={() => Linking.openURL(scryfallLink(card.name))}>
+        <Text
+          onPress={() => Linking.openURL(scryfallLink(card.name))}
+          onLongPress={() => this.copyCardDialog(card)}
+        >
           <Text style={[styles.cardText]}>
             {card.name} | {card.manaCost}
             {"\n"}
@@ -167,6 +199,7 @@ class CardCard extends Component {
           <Text style={[styles.cardTextBody, styles.cardText]}>
             {card.text}
             {card.power ? <Text> | {card.power}/{card.toughness}</Text> : ""}
+            {card.loyalty ? "\n" + card.loyalty : ""}
 
           </Text>
         </Text>
@@ -205,7 +238,7 @@ class SearchResults extends Component {
         </View>
 
         <Text>
-          Tap a card to view on Scryfall.
+          Tap a card to view on Scryfall. Long tap to copy/paste.
         </Text>
         <View>
           {this.props.response.similar_cards.map((cardObj, index) => (
