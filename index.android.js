@@ -354,12 +354,15 @@ const styles = StyleSheet.create({
   pageNavButton: {
     width: 100,
     height: 50,
+    alignItems: "center",
+    justifyContent: "center",
     color: "#000000",
     borderWidth: 1,
-    borderColor: "#42bcf4",
+    borderColor: "#41d9f4",
     borderRadius: 7,
     textAlign: "center",
-    backgroundColor: "#42bcf4",
+    backgroundColor: "#41d9f4",
+    textAlignVertical: "center",
     margin: 5
   },
   pageNavButtonInactive: {
