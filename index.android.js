@@ -37,6 +37,7 @@ class Banner extends Component {
     );
   }
 }
+
 class CardSearch extends Component {
   _getAllCards() {
     fetch(
@@ -122,47 +123,38 @@ class CardSearch extends Component {
           />
 
           <View>
-            {this.state.searchQuery.length > 0
-              ? <View>
-                  <Text>
-                    Suggestions
+            {this.state.searchQuery.length > 0 &&
+              <View>
+                <Text>
+                  Suggestions
+                </Text>
 
-                  </Text>
-
-                  {this.state.matchingCards
-                    .slice(0, 10)
-                    .map((cardName, index) => (
-                      <Text
-                        key={index}
-                        onPress={() => {
-                          this.query(cardName);
-                          Keyboard.dismiss();
-                        }}
-                        style={styles.cardCompleteSuggestion}
-                      >
-                        {" "} {cardName} {" "}
-                      </Text>
-                    ))}
-                </View>
-              : <Text />}
+                {this.state.matchingCards
+                  .slice(0, 10)
+                  .map((cardName, index) => (
+                    <Text
+                      key={index}
+                      onPress={() => {
+                        this.query(cardName);
+                        Keyboard.dismiss();
+                      }}
+                      style={styles.cardCompleteSuggestion}
+                    >
+                      {cardName}
+                    </Text>
+                  ))}
+              </View>}
 
           </View>
 
-          {this.state.loaded
-            ? <View>
-
-                <SearchResults response={this.state.response} />
-
-                <View style={styles.cardSearchNavbar}>
-                  <Text style={styles.pageNavButton}>
-                    Decrement page
-                  </Text>
-                  <Text style={styles.pageNavButton}>
-                    Increment page
-                  </Text>
-                </View>
+          {this.state.loaded &&
+            <View>
+              <SearchResults response={this.state.response} />
+              <View style={styles.cardSearchNavbar}>
+                <Text style={styles.pageNavButton}> Decrement page </Text>
+                <Text style={styles.pageNavButton}> Increment page </Text>
               </View>
-            : <Text />}
+            </View>}
         </ScrollView>
       </View>
     );
@@ -192,7 +184,7 @@ class CardCard extends Component {
               card.type,
               card.set.code + "(" + card.set.name + ")",
               card.text,
-              card.power ? card.power + "/" + card.toughness : "",
+              card.power && card.power + "/" + card.toughness,
               card.loyalty
             ].join("\n")
           );
@@ -217,8 +209,8 @@ class CardCard extends Component {
           </Text>
           <Text style={[styles.cardTextBody, styles.cardText]}>
             {card.text}
-            {card.power ? <Text> | {card.power}/{card.toughness}</Text> : ""}
-            {card.loyalty ? "\n" + card.loyalty : ""}
+            {card.power && <Text> | {card.power}/{card.toughness}</Text>}
+            {card.loyalty && "\n" + card.loyalty}
 
           </Text>
         </Text>
