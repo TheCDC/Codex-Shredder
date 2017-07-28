@@ -15,7 +15,8 @@ import {
   Linking,
   Keyboard,
   Alert,
-  Clipboard
+  Clipboard,
+  ActivityIndicator
 } from "react-native";
 
 var cardsObj = require("./res/cards.json");
@@ -55,14 +56,16 @@ class CardSearch extends Component {
     super(props);
     this.state = {
       searchQuery: "",
-      loaded: false,
+      loaded: true,
       matchingCards: [],
       cardList: cardsObj.cards,
-      page: 1
+      page: 1,
+      response: null
     };
     this._getAllCards();
   }
   query(targetName, requestedPage) {
+    this.setState({ loaded: false });
     const targetPage = requestedPage + 1;
     this.setState({ page: targetPage });
     // filter card names containing the query
@@ -150,6 +153,9 @@ class CardSearch extends Component {
           </View>
 
           {this.state.loaded &&
+            this.state.response != null &&
+            (this.state.response.similar_cards != null ||
+              this.state.response.similar_cards !== undefined) &&
             <View>
               <SearchResults response={this.state.response} />
               <View style={styles.cardSearchNavbar}>
@@ -180,6 +186,7 @@ class CardSearch extends Component {
                 </Text>
               </View>
             </View>}
+          {this.state.loaded == false && <ActivityIndicator size="large" />}
         </ScrollView>
       </View>
     );
