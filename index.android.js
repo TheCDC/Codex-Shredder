@@ -56,7 +56,8 @@ class CardSearch extends Component {
       searchQuery: "",
       loaded: false,
       matchingCards: [],
-      cardList: cardsObj.cards
+      cardList: cardsObj.cards,
+      page: 1
     };
     this._getAllCards();
   }
@@ -121,28 +122,46 @@ class CardSearch extends Component {
           />
 
           <View>
-            <Text>
-              Suggestions
-            </Text>
             {this.state.searchQuery.length > 0
-              ? this.state.matchingCards.slice(0, 10).map((cardName, index) => (
-                  <Text
-                    key={index}
-                    onPress={() => {
-                      this.query(cardName);
-                      Keyboard.dismiss();
-                    }}
-                    style={styles.cardCompleteSuggestion}
-                  >
-                    {" "} {cardName} {" "}
+              ? <View>
+                  <Text>
+                    Suggestions
+
                   </Text>
-                ))
+
+                  {this.state.matchingCards
+                    .slice(0, 10)
+                    .map((cardName, index) => (
+                      <Text
+                        key={index}
+                        onPress={() => {
+                          this.query(cardName);
+                          Keyboard.dismiss();
+                        }}
+                        style={styles.cardCompleteSuggestion}
+                      >
+                        {" "} {cardName} {" "}
+                      </Text>
+                    ))}
+                </View>
               : <Text />}
 
           </View>
 
           {this.state.loaded
-            ? <SearchResults response={this.state.response} />
+            ? <View>
+
+                <SearchResults response={this.state.response} />
+
+                <View style={styles.cardSearchNavbar}>
+                  <Text style={styles.pageNavButton}>
+                    Decrement page
+                  </Text>
+                  <Text style={styles.pageNavButton}>
+                    Increment page
+                  </Text>
+                </View>
+              </View>
             : <Text />}
         </ScrollView>
       </View>
@@ -301,6 +320,16 @@ const styles = StyleSheet.create({
   },
   searchedCard: {
     backgroundColor: "wheat"
+  },
+  cardSearchNavbar: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  pageNavButton: {
+    width: 100,
+    height: 50
   }
 });
 
