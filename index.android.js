@@ -62,7 +62,9 @@ class CardSearch extends Component {
     };
     this._getAllCards();
   }
-  query(targetName) {
+  query(targetName, requestedPage) {
+    const targetPage = requestedPage + 1;
+    this.setState({ page: targetPage });
     // filter card names containing the query
     var foundMatches = this.state.cardList.filter(function(cardName) {
       const a = cardName.toLowerCase();
@@ -86,7 +88,7 @@ class CardSearch extends Component {
 
     this.setState({ searchQuery: finalName });
 
-    let params = { card: finalName };
+    let params = { card: finalName, page: targetPage };
     let qs = queryString.stringify(params);
     let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
 
@@ -117,7 +119,7 @@ class CardSearch extends Component {
         <ScrollView keyboardShouldPersistTaps={"always"}>
           <Banner />
           <TextInput
-            onChangeText={text => this.query(text)}
+            onChangeText={text => this.query(text, 0)}
             placeholder="Search for a card"
             onSubmitEditing={Keyboard.dismiss}
           />
@@ -135,7 +137,7 @@ class CardSearch extends Component {
                     <Text
                       key={index}
                       onPress={() => {
-                        this.query(cardName);
+                        this.query(cardName, 0);
                         Keyboard.dismiss();
                       }}
                       style={styles.cardCompleteSuggestion}
@@ -151,8 +153,31 @@ class CardSearch extends Component {
             <View>
               <SearchResults response={this.state.response} />
               <View style={styles.cardSearchNavbar}>
-                <Text style={styles.pageNavButton}> Decrement page </Text>
-                <Text style={styles.pageNavButton}> Increment page </Text>
+                {this.state.page > 1
+                  ? <Text
+                      style={styles.pageNavButton}
+                      onPress={() =>
+                        this.query(this.state.searchQuery, this.state.page - 2)}
+                    >
+                      {this.state.page - 1}
+                    </Text>
+                  : <Text
+                      style={[
+                        styles.pageNavButton,
+                        styles.pageNavButtonInactive
+                      ]}
+                    />}
+                <Text>
+                  {this.state.page}
+                </Text>
+                <Text
+                  style={styles.pageNavButton}
+                  onPress={() =>
+                    this.query(this.state.searchQuery, this.state.page)}
+                >
+
+                  {this.state.page + 1}
+                </Text>
               </View>
             </View>}
         </ScrollView>
@@ -321,7 +346,18 @@ const styles = StyleSheet.create({
   },
   pageNavButton: {
     width: 100,
-    height: 50
+    height: 50,
+    color: "#000000",
+    borderWidth: 1,
+    borderColor: "#42bcf4",
+    borderRadius: 7,
+    textAlign: "center",
+    backgroundColor: "#42bcf4",
+    margin: 5
+  },
+  pageNavButtonInactive: {
+    borderColor: "#F5FCFF",
+    backgroundColor: "#F5FCFF"
   }
 });
 
