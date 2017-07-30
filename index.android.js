@@ -55,6 +55,7 @@ class CardSearch extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      searchText: "",
       searchQuery: "",
       loaded: true,
       matchingCards: [],
@@ -122,13 +123,20 @@ class CardSearch extends Component {
         <ScrollView keyboardShouldPersistTaps={"always"}>
           <Banner />
           <TextInput
-            onChangeText={text => this.query(text, 0)}
-            placeholder="Search for a card"
+            onChangeText={text => {
+              this.setState({ searchText: text });
+              this.query(text, 0);
+            }}
+            placeholder="Search by card name"
             onSubmitEditing={Keyboard.dismiss}
+            onFocus={() => {
+              this.query(this.state.searchText, 0);
+            }}
           />
 
           <View>
             {this.state.searchQuery.length > 0 &&
+              this.state.matchingCards.length > 1 &&
               <View>
                 <Text>
                   Suggestions
