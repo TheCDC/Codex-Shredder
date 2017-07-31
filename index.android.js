@@ -68,7 +68,7 @@ class CardSearch extends Component {
     this.state = {
       searchText: "",
       searchQuery: "",
-      loaded: true,
+      searchIsLoaded: true,
       matchingCards: [],
       cardList: cardsObj.cards,
       page: 1,
@@ -84,7 +84,7 @@ class CardSearch extends Component {
     );
   }
   query(targetName, requestedPage) {
-    this.setState({ loaded: false });
+    this.setState({ searchIsLoaded: false });
     const targetPage = requestedPage + 1;
     this.setState({ page: targetPage });
     // filter card names containing the query
@@ -118,9 +118,13 @@ class CardSearch extends Component {
       .then(response => response.json())
       .then(text => {
         if (text !== undefined && text !== null) {
-          this.setState({ response: text, url: targetUrl, loaded: true });
+          this.setState({
+            response: text,
+            url: targetUrl,
+            searchIsLoaded: true
+          });
         } else {
-          this.setState({ loaded: false, response: null });
+          this.setState({ searchIsLoaded: false, response: null });
         }
       })
       .catch(error => {
@@ -180,7 +184,7 @@ class CardSearch extends Component {
 
           </View>
 
-          {this.state.loaded &&
+          {this.state.searchIsLoaded &&
             this.state.response != null &&
             (this.state.response.similar_cards != null ||
               this.state.response.similar_cards !== undefined) &&
@@ -215,7 +219,8 @@ class CardSearch extends Component {
                 </Text>
               </View>
             </View>}
-          {this.state.loaded == false && <ActivityIndicator size="large" />}
+          {this.state.searchIsLoaded == false &&
+            <ActivityIndicator size="large" />}
         </ScrollView>
       </View>
     );
