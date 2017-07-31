@@ -16,13 +16,14 @@ import {
   Keyboard,
   Alert,
   Clipboard,
-  ActivityIndicator
+  ActivityIndicator,
+  BackHandler
 } from "react-native";
 
 var cardsObj = require("./res/cards.json");
 
-function scryfallLink(cardName) {
-  return "http://scryfall.com/search?" + queryString.stringify({ q: cardName });
+function scryfallLink(card) {
+  return "http://scryfall.com/search?" + queryString.stringify({ q: card.name,t: card.type,mana: card.manaCost});
 }
 
 const queryString = require("query-string");
@@ -52,6 +53,12 @@ class CardSearch extends Component {
         console.error(error);
       });
   }
+  _clearQuery() {
+    if (this._textinput !== null) {
+      this._textinput.setNativeProps({ text: "" });
+      this.query("",0);
+    }
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -64,6 +71,13 @@ class CardSearch extends Component {
       response: null
     };
     this._getAllCards();
+    BackHandler.addEventListener(
+      "BackHandler",
+      function() {
+        this._clearQuery();
+        return true;
+      }.bind(this)
+    );
   }
   query(targetName, requestedPage) {
     this.setState({ loaded: false });
@@ -123,6 +137,7 @@ class CardSearch extends Component {
         <ScrollView keyboardShouldPersistTaps={"always"}>
           <Banner />
           <TextInput
+            ref={component => (this._textinput = component)}
             onChangeText={text => {
               this.setState({ searchText: text });
               this.query(text, 0);
@@ -136,7 +151,8 @@ class CardSearch extends Component {
 
           <View>
             {this.state.searchQuery.length > 0 &&
-              this.state.matchingCards.length > 1 &&
+              this.state.matchingCards.length > 0 &&
+              this.state.matchingCards[0] !== this.state.searchQuery &&
               <View>
                 <Text>
                   Suggestions
@@ -169,7 +185,7 @@ class CardSearch extends Component {
               <View style={styles.cardSearchNavbar}>
                 {this.state.page > 1
                   ? <Text
-                      style={styles.pageNavButton}
+                      style={[styles.pageNavButton, styles.navButtonText]}
                       onPress={() =>
                         this.query(this.state.searchQuery, this.state.page - 2)}
                     >
@@ -178,14 +194,15 @@ class CardSearch extends Component {
                   : <Text
                       style={[
                         styles.pageNavButton,
-                        styles.pageNavButtonInactive
+                        styles.pageNavButtonInactive,
+                        styles.navButtonText
                       ]}
                     />}
-                <Text>
+                <Text style={[styles.navButtonText]}>
                   {this.state.page}
                 </Text>
                 <Text
-                  style={styles.pageNavButton}
+                  style={[styles.pageNavButton, styles.navButtonText]}
                   onPress={() =>
                     this.query(this.state.searchQuery, this.state.page)}
                 >
@@ -238,7 +255,7 @@ class CardCard extends Component {
     return (
       <View style={styles.cardCard}>
         <Text
-          onPress={() => Linking.openURL(scryfallLink(card.name))}
+          onPress={() => Linking.openURL(scryfallLink(card))}
           onLongPress={() => this.copyCardDialog(card)}
         >
           <Text style={[styles.cardText]}>
@@ -335,6 +352,7 @@ const styles = StyleSheet.create({
     padding: 1
   },
   cardText: {
+    fontSize: 17,
     color: "#000000"
   },
   cardTextBody: {
@@ -348,7 +366,8 @@ const styles = StyleSheet.create({
     borderColor: "#AAAAFF",
     color: "#000000",
     margin: 1,
-    padding: 3
+    padding: 3,
+    fontSize: 15
   },
   searchedCard: {
     backgroundColor: "wheat"
@@ -372,6 +391,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#41d9f4",
     textAlignVertical: "center",
     margin: 5
+  },
+  navButtonText: {
+    fontSize: 30
   },
   pageNavButtonInactive: {
     borderColor: "#F5FCFF",
