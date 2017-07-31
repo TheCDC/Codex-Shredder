@@ -23,7 +23,11 @@ import {
 var cardsObj = require("./res/cards.json");
 
 function scryfallLink(card) {
-  return "http://scryfall.com/search?" + queryString.stringify({ q: card.name,t: card.type,mana: card.manaCost});
+  return (
+    "http://scryfall.com/search?" +
+    queryString.stringify({ q: card.name + " t:" + card.type + " mana:" }) +
+    card.manaCost
+  );
 }
 
 const queryString = require("query-string");
@@ -56,7 +60,7 @@ class CardSearch extends Component {
   _clearQuery() {
     if (this._textinput !== null) {
       this._textinput.setNativeProps({ text: "" });
-      this.query("",0);
+      this.query("", 0);
     }
   }
   constructor(props) {
@@ -366,8 +370,7 @@ const styles = StyleSheet.create({
     borderColor: "#AAAAFF",
     color: "#000000",
     margin: 1,
-    padding: 3,
-    fontSize: 15
+    fontSize: 17
   },
   searchedCard: {
     backgroundColor: "wheat"
