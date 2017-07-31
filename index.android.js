@@ -23,11 +23,11 @@ import {
 var cardsObj = require("./res/cards.json");
 
 function scryfallLink(card) {
-  return (
+  let url =
     "http://scryfall.com/search?" +
-    queryString.stringify({ q: card.name + " t:" + card.type + " mana:" }) +
-    card.manaCost
-  );
+    queryString.stringify({ q: card.name + " mana:" }) +
+    card.manaCost;
+  return url;
 }
 
 const queryString = require("query-string");
