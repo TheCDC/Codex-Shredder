@@ -32,13 +32,49 @@ function scryfallLink(card) {
 
 const queryString = require("query-string");
 
+const COLORS = ["W", "U", "B", "R", "G"];
 class Banner extends Component {
   render() {
     return (
       <View>
         <Text style={styles.welcome}>
-          Codex Shredder v0.1
+          Codex Shredder
         </Text>
+      </View>
+    );
+  }
+}
+
+class ColorPicker extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      callback: props.callback,
+      colors: [false, false, false, false, false]
+    };
+  }
+  render() {
+    return (
+      <View style={styles.colorPickerContainer}>
+        <Text />
+        {COLORS.map((item, index) => (
+          <Text
+            style={
+              this.state.colors[index]
+                ? [styles.colorPickerButton, styles.colorPickerButtonActive]
+                : [styles.colorPickerButton, styles.colorPickerButtonInactive]
+            }
+            key={index}
+            onPress={() => {
+              let newcolors = this.state.colors;
+              newcolors[index] = !newcolors[index];
+              this.setState({ colors: newcolors });
+              this.state.callback(newcolors);
+            }}
+          >
+            {item}
+          </Text>
+        ))}
       </View>
     );
   }
@@ -72,7 +108,8 @@ class CardSearch extends Component {
       matchingCards: [],
       cardList: cardsObj.cards,
       page: 1,
-      response: null
+      response: null,
+      colors: []
     };
     this._getAllCards();
     BackHandler.addEventListener(
@@ -110,9 +147,18 @@ class CardSearch extends Component {
 
     this.setState({ searchQuery: finalName });
 
+    // build the url
     let params = { card: finalName, page: targetPage };
     let qs = queryString.stringify(params);
     let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
+    // hack to get color filtering
+    this.state.colors.map(
+      (item, index) => (
+
+        targetUrl += item ? "&ci=" + COLORS[index] : ''
+        )
+    );
+    console.warn(targetUrl);
 
     fetch(targetUrl)
       .then(response => response.json())
@@ -156,7 +202,16 @@ class CardSearch extends Component {
               this.query(this.state.searchText, 0);
             }}
           />
-
+          <View>
+            <ColorPicker
+              callback={arg => {
+                this.setState({ colors: arg });
+                this.query(this.state.searchQuery, 0);
+                this.forceUpdate();
+                console.warn(arg);
+              }}
+            />
+          </View>
           <View>
             {this.state.searchQuery.length > 0 &&
               this.state.matchingCards.length > 0 &&
@@ -406,6 +461,26 @@ const styles = StyleSheet.create({
   pageNavButtonInactive: {
     borderColor: "#F5FCFF",
     backgroundColor: "#F5FCFF"
+  },
+  colorPickerContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  colorPickerButton: {
+    width: 35,
+    backgroundColor: "#AAAAAA",
+    borderRadius: 3,
+    fontSize: 20,
+    textAlign: "center",
+    marginHorizontal: 5
+  },
+  colorPickerButtonActive: {
+    backgroundColor: "#AAFFAA"
+  },
+  colorPickerButtonInactive: {
+    backgroundColor: "#FFAAAA"
   }
 });
 
