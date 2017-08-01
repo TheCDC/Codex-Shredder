@@ -158,7 +158,6 @@ class CardSearch extends Component {
         targetUrl += item ? "&ci=" + COLORS[index] : ''
         )
     );
-    console.warn(targetUrl);
 
     fetch(targetUrl)
       .then(response => response.json())
@@ -208,7 +207,6 @@ class CardSearch extends Component {
                 this.setState({ colors: arg });
                 this.query(this.state.searchQuery, 0);
                 this.forceUpdate();
-                console.warn(arg);
               }}
             />
           </View>
