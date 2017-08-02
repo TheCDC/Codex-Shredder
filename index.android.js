@@ -428,7 +428,8 @@ const styles = StyleSheet.create({
     borderColor: "#AAAAFF",
     color: "#000000",
     margin: 1,
-    fontSize: 17
+    fontSize: 17,
+    paddingHorizontal: 3,
   },
   searchedCard: {
     backgroundColor: "wheat"
