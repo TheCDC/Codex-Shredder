@@ -17,7 +17,8 @@ import {
   Alert,
   Clipboard,
   ActivityIndicator,
-  BackHandler
+  BackHandler,
+  TouchableOpacity
 } from "react-native";
 
 var cardsObj = require("./res/cards.json");
@@ -33,6 +34,13 @@ function scryfallLink(card) {
 const queryString = require("query-string");
 
 const COLORS = ["W", "U", "B", "R", "G"];
+const COLORCOLORS = {
+  W: "#FFF9D6",
+  U: "#5EBEFF",
+  B: "#000000",
+  R: "#FF0000",
+  G: "#1FAA00"
+};
 class Banner extends Component {
   render() {
     return (
@@ -50,27 +58,27 @@ class ColorPicker extends Component {
     super(props);
     this.state = {
       callback: props.callback,
-      colors: [false, false, false, false, false]
+      colors: [true, true, true, true, true]
     };
   }
   render() {
     return (
       <View style={styles.colorPickerContainer}>
-        <Text />
         {COLORS.map((item, index) => (
           <Text
+            onPress={() => {
+              let newcolors = this.state.colors;
+              newcolors[index] = !newcolors[index];
+              this.forceUpdate();
+              this.state.callback(newcolors);
+              this.setState({ colors: newcolors });
+            }}
+            key={index}
             style={
               this.state.colors[index]
                 ? [styles.colorPickerButton, styles.colorPickerButtonActive]
                 : [styles.colorPickerButton, styles.colorPickerButtonInactive]
             }
-            key={index}
-            onPress={() => {
-              let newcolors = this.state.colors;
-              newcolors[index] = !newcolors[index];
-              this.setState({ colors: newcolors });
-              this.state.callback(newcolors);
-            }}
           >
             {item}
           </Text>
@@ -153,10 +161,7 @@ class CardSearch extends Component {
     let targetUrl = "https://card-codex-clone.herokuapp.com/api/?" + qs;
     // hack to get color filtering
     this.state.colors.map(
-      (item, index) => (
-
-        targetUrl += item ? "&ci=" + COLORS[index] : ''
-        )
+      (item, index) => (targetUrl += item ? "&ci=" + COLORS[index] : "")
     );
 
     fetch(targetUrl)
@@ -222,16 +227,17 @@ class CardSearch extends Component {
                 {this.state.matchingCards
                   .slice(0, 10)
                   .map((cardName, index) => (
-                    <Text
+                    <TouchableOpacity
                       key={index}
                       onPress={() => {
                         this.query(cardName, 0);
                         Keyboard.dismiss();
                       }}
-                      style={styles.cardCompleteSuggestion}
                     >
-                      {cardName}
-                    </Text>
+                      <Text style={styles.cardCompleteSuggestion}>
+                        {cardName}
+                      </Text>
+                    </TouchableOpacity>
                   ))}
               </View>}
 
@@ -245,13 +251,16 @@ class CardSearch extends Component {
               <SearchResults response={this.state.response} />
               <View style={styles.cardSearchNavbar}>
                 {this.state.page > 1
-                  ? <Text
-                      style={[styles.pageNavButton, styles.navButtonText]}
+                  ? <TouchableOpacity
                       onPress={() =>
                         this.query(this.state.searchQuery, this.state.page - 2)}
                     >
-                      {this.state.page - 1}
-                    </Text>
+                      <Text
+                        style={[styles.pageNavButton, styles.navButtonText]}
+                      >
+                        {this.state.page - 1}
+                      </Text>
+                    </TouchableOpacity>
                   : <Text
                       style={[
                         styles.pageNavButton,
@@ -262,14 +271,16 @@ class CardSearch extends Component {
                 <Text style={[styles.navButtonText]}>
                   {this.state.page}
                 </Text>
-                <Text
-                  style={[styles.pageNavButton, styles.navButtonText]}
+                <TouchableOpacity
                   onPress={() =>
                     this.query(this.state.searchQuery, this.state.page)}
                 >
 
-                  {this.state.page + 1}
-                </Text>
+                  <Text style={[styles.pageNavButton, styles.navButtonText]}>
+
+                    {this.state.page + 1}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>}
           {this.state.searchIsLoaded == false &&
@@ -315,25 +326,66 @@ class CardCard extends Component {
   render() {
     const card = this.props.card;
     return (
-      <View style={styles.cardCard}>
-        <Text
-          onPress={() => Linking.openURL(scryfallLink(card))}
-          onLongPress={() => this.copyCardDialog(card)}
-        >
-          <Text style={[styles.cardText]}>
-            {card.name} | {card.manaCost}
-            {"\n"}
+      <TouchableOpacity
+        onPress={() => Linking.openURL(scryfallLink(card))}
+        onLongPress={() => this.copyCardDialog(card)}
+        style={styles.cardCard}
+      >
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between"
+            }}
+          >
+
+            <View
+              style={{
+                width: 75,
+                flexDirection: "row",
+                backgroundColor: "#DFDFDF",
+                justifyContent: "flex-start",
+                height: 15,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10
+              }}
+            >
+              {card.colorIdentity &&
+                card.colorIdentity.map((item, index) => (
+                  <View
+                    style={{
+                      width: 15,
+                      height: 15,
+                      backgroundColor: COLORCOLORS[item],
+                      borderRadius: 10,
+                      borderColor: "#000000",
+                      borderWidth: 1
+                    }}
+                    key={index}
+                  />
+                ))}
+            </View>
+            <Text style={[styles.cardText]}>
+              {card.name}
+            </Text>
+            <Text style={[styles.cardText]}>
+              {card.manaCost}
+            </Text>
+          </View>
+
+          <Text style={[styles.cardText, styles.cardTextBody]}>
             {card.type} | {card.set.code} ({card.set.name})
-            {"\n"}
           </Text>
-          <Text style={[styles.cardTextBody, styles.cardText]}>
+          <Text style={[styles.cardText, styles.cardTextBody]}>
             {card.text}
             {card.power && <Text> | {card.power}/{card.toughness}</Text>}
             {card.loyalty && "\n" + card.loyalty}
 
           </Text>
-        </Text>
-      </View>
+        </View>
+
+      </TouchableOpacity>
     );
   }
 }
@@ -359,7 +411,7 @@ class SearchResults extends Component {
     }
     return (
       <View>
-        <Text>
+        <Text style={{ textAlign: "center" }}>
           Your search
         </Text>
         <View style={[styles.searchedCard]}>
@@ -367,7 +419,7 @@ class SearchResults extends Component {
 
         </View>
 
-        <Text>
+        <Text style={{ textAlign: "center" }}>
           Tap a card to view on Scryfall. Long tap to copy/paste.
         </Text>
         <View>
@@ -411,15 +463,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000000",
     margin: 3,
-    padding: 1
+    padding: 1,
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   cardText: {
     fontSize: 17,
-    color: "#000000"
+    color: "#000000",
+    flex: 1,
+    textAlign: "center"
   },
   cardTextBody: {
-    margin: 1,
-    padding: 1
+    margin: 0,
+    padding: 1,
+    textAlign: "left"
   },
   cardCompleteSuggestion: {
     backgroundColor: "#AAAAFF",
@@ -429,7 +487,7 @@ const styles = StyleSheet.create({
     color: "#000000",
     margin: 1,
     fontSize: 17,
-    paddingHorizontal: 3,
+    paddingHorizontal: 3
   },
   searchedCard: {
     backgroundColor: "wheat"
@@ -441,8 +499,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   pageNavButton: {
-    width: 100,
-    height: 50,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
     color: "#000000",
