@@ -14,16 +14,14 @@ export default class AutocompleteSuggestion extends Component {
     super(props);
     this.state = {
       callback: props.callback,
-      cardName: props.cardName,
+      cardName: props.cardName
     };
   }
 
   render() {
     const card = this.props.card;
     return (
-      <TouchableOpacity
-        onPress={() => this.state.callback()}
-      >
+      <TouchableOpacity onPress={() => this.state.callback()}>
         <Text style={styles.cardCompleteSuggestion}>
           {this.state.cardName}
         </Text>

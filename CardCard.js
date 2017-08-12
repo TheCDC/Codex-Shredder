@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Linking } from "react-native";
 
 const COLORCOLORS = {
   W: "#FFF9D6",
@@ -8,6 +8,17 @@ const COLORCOLORS = {
   R: "#FF0000",
   G: "#1FAA00"
 };
+
+function scryfallLink(card) {
+  let url =
+    "http://scryfall.com/search?" +
+    queryString.stringify({ q: card.name + " mana:" }) +
+    card.manaCost;
+  return url;
+}
+
+const queryString = require("query-string");
+
 
 export default class CardCard extends Component {
   constructor(props) {

@@ -27,13 +27,6 @@ import AutocompleteSuggestion from "./AutocompleteSuggestion";
 
 var cardsObj = require("./res/cards.json");
 
-function scryfallLink(card) {
-  let url =
-    "http://scryfall.com/search?" +
-    queryString.stringify({ q: card.name + " mana:" }) +
-    card.manaCost;
-  return url;
-}
 
 const queryString = require("query-string");
 
@@ -214,43 +207,59 @@ class CardSearch extends Component {
               this.state.response.similar_cards !== undefined) &&
             <View>
               <SearchResults response={this.state.response} />
-              <View style={styles.cardSearchNavbar}>
-                {this.state.page > 1
-                  ? <TouchableOpacity
-                      onPress={() =>
-                        this.query(this.state.searchQuery, this.state.page - 2)}
-                    >
-                      <Text
-                        style={[styles.pageNavButton, styles.navButtonText]}
-                      >
-                        {this.state.page - 1}
-                      </Text>
-                    </TouchableOpacity>
-                  : <Text
-                      style={[
-                        styles.pageNavButton,
-                        styles.pageNavButtonInactive,
-                        styles.navButtonText
-                      ]}
-                    />}
-                <Text style={[styles.navButtonText]}>
-                  {this.state.page}
-                </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.query(this.state.searchQuery, this.state.page)}
-                >
-
-                  <Text style={[styles.pageNavButton, styles.navButtonText]}>
-
-                    {this.state.page + 1}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <NavBar
+                page={this.state.page}
+                previousCallback={() => {
+                  this.query(this.state.searchQuery, this.state.page - 2);
+                }}
+                nextCallback={() => {
+                  this.query(this.state.searchQuery, this.state.page);
+                }}
+              />
             </View>}
           {this.state.searchIsLoaded == false &&
             <ActivityIndicator size="large" />}
         </ScrollView>
+      </View>
+    );
+  }
+}
+
+class NavBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      page: props.page,
+      previousCallback: props.previousCallback,
+      nextCallback: props.nextCallback
+    };
+  }
+  render() {
+    return (
+      <View style={styles.cardSearchNavbar}>
+        {this.state.page > 1
+          ? <TouchableOpacity onPress={() => this.state.previousCallback()}>
+              <Text style={[styles.pageNavButton, styles.navButtonText]}>
+                {this.state.page - 1}
+              </Text>
+            </TouchableOpacity>
+          : <Text
+              style={[
+                styles.pageNavButton,
+                styles.pageNavButtonInactive,
+                styles.navButtonText
+              ]}
+            />}
+        <Text style={[styles.navButtonText]}>
+          {this.state.page}
+        </Text>
+        <TouchableOpacity onPress={() => this.state.nextCallback()}>
+
+          <Text style={[styles.pageNavButton, styles.navButtonText]}>
+
+            {this.state.page + 1}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
