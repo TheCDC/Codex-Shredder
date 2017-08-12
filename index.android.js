@@ -144,7 +144,7 @@ class CardSearch extends Component {
       });
   }
   render() {
-    let matchingCards = this.state.matchingCards.slice(0, 19);
+    let matchingCards = this.state.matchingCards.slice(0, 10);
     if (this.state.cardList.length === 0) {
       return (
         <View>
