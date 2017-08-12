@@ -324,16 +324,6 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 5
   },
-  cardCompleteSuggestion: {
-    backgroundColor: "#AAAAFF",
-    borderWidth: 1,
-    borderRadius: 7,
-    borderColor: "#AAAAFF",
-    color: "#000000",
-    margin: 1,
-    fontSize: 17,
-    paddingHorizontal: 3
-  },
   searchedCard: {
     backgroundColor: "wheat"
   },
