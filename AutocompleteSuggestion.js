@@ -19,7 +19,6 @@ export default class AutocompleteSuggestion extends Component {
   }
 
   render() {
-    const card = this.props.card;
     return (
       <TouchableOpacity onPress={() => this.state.callback()}>
         <Text style={styles.cardCompleteSuggestion}>

@@ -144,6 +144,7 @@ class CardSearch extends Component {
       });
   }
   render() {
+    let matchingCards = this.state.matchingCards.slice(0, 19);
     if (this.state.cardList.length === 0) {
       return (
         <View>
@@ -161,6 +162,7 @@ class CardSearch extends Component {
             onChangeText={text => {
               this.setState({ searchText: text });
               this.query(text, 0);
+              this.forceUpdate();
             }}
             placeholder="Search by card name"
             onSubmitEditing={Keyboard.dismiss}
@@ -178,25 +180,21 @@ class CardSearch extends Component {
           </View>
           <View>
             {this.state.searchQuery.length > 0 &&
-              this.state.matchingCards.length > 0 &&
-              this.state.matchingCards[0] !== this.state.searchQuery &&
+              matchingCards.length > 0 &&
               <View>
                 <Text>
                   Suggestions
                 </Text>
-
-                {this.state.matchingCards
-                  .slice(0, 10)
-                  .map((cardName, index) => (
-                    <AutocompleteSuggestion
-                      key={index}
-                      cardName={cardName}
-                      callback={() => {
-                        this.query(cardName, 0);
-                        Keyboard.dismiss();
-                      }}
-                    />
-                  ))}
+                {matchingCards.map((name, index) => (
+                  <AutocompleteSuggestion
+                    key={name}
+                    cardName={name}
+                    callback={() => {
+                      this.query(name, 0);
+                      Keyboard.dismiss();
+                    }}
+                  />
+                ))}
               </View>}
 
           </View>
@@ -293,33 +291,6 @@ const styles = StyleSheet.create({
   },
   searchedCard: {
     backgroundColor: "wheat"
-  },
-  cardSearchNavbar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  pageNavButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#000000",
-    borderWidth: 1,
-    borderColor: "#41d9f4",
-    borderRadius: 7,
-    textAlign: "center",
-    backgroundColor: "#41d9f4",
-    textAlignVertical: "center",
-    margin: 5
-  },
-  navButtonText: {
-    fontSize: 30
-  },
-  pageNavButtonInactive: {
-    borderColor: "#F5FCFF",
-    backgroundColor: "#F5FCFF"
   }
 });
 
