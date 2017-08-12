@@ -21,6 +21,8 @@ import {
   TouchableOpacity
 } from "react-native";
 
+import ColorPicker from './ColorPicker';
+
 var cardsObj = require("./res/cards.json");
 
 function scryfallLink(card) {
@@ -48,41 +50,6 @@ class Banner extends Component {
         <Text style={styles.welcome}>
           Codex Shredder
         </Text>
-      </View>
-    );
-  }
-}
-
-class ColorPicker extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      callback: props.callback,
-      colors: [true, true, true, true, true]
-    };
-  }
-  render() {
-    return (
-      <View style={styles.colorPickerContainer}>
-        {COLORS.map((item, index) => (
-          <Text
-            onPress={() => {
-              let newcolors = this.state.colors;
-              newcolors[index] = !newcolors[index];
-              this.forceUpdate();
-              this.state.callback(newcolors);
-              this.setState({ colors: newcolors });
-            }}
-            key={index}
-            style={
-              this.state.colors[index]
-                ? [styles.colorPickerButton, styles.colorPickerButtonActive]
-                : [styles.colorPickerButton, styles.colorPickerButtonInactive]
-            }
-          >
-            {item}
-          </Text>
-        ))}
       </View>
     );
   }
