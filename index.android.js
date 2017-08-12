@@ -22,6 +22,7 @@ import {
 } from "react-native";
 
 import ColorPicker from './ColorPicker';
+import CardCard from './CardCard';
 
 var cardsObj = require("./res/cards.json");
 
@@ -258,105 +259,6 @@ class CardSearch extends Component {
   }
 }
 
-class CardCard extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  copyCardDialog(card) {
-    Alert.alert("Copy " + card.name, "Copy full card name or full text", [
-      {
-        text: "Name",
-        onPress: () => {
-          Clipboard.setString(card.name);
-        }
-      },
-      {
-        text: "Text",
-        onPress: () => {
-          Clipboard.setString(
-            [
-              card.name,
-              card.manaCost,
-              card.type,
-              card.set.code + "(" + card.set.name + ")",
-              card.text,
-              card.power && card.power + "/" + card.toughness,
-              card.loyalty
-            ].join("\n")
-          );
-        }
-      }
-    ]);
-  }
-
-  render() {
-    const card = this.props.card;
-    return (
-      <TouchableOpacity
-        onPress={() => Linking.openURL(scryfallLink(card))}
-        onLongPress={() => this.copyCardDialog(card)}
-        style={styles.cardCard}
-      >
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between"
-            }}
-          >
-
-            <View
-              style={{
-                width: 75,
-                flexDirection: "row",
-                backgroundColor: "#DFDFDF",
-                justifyContent: "flex-start",
-                height: 15,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10
-              }}
-            >
-              {card.colorIdentity &&
-                card.colorIdentity.map((item, index) => (
-                  <View
-                    style={{
-                      width: 15,
-                      height: 15,
-                      backgroundColor: COLORCOLORS[item],
-                      borderRadius: 10,
-                      borderColor: "#000000",
-                      borderWidth: 1
-                    }}
-                    key={index}
-                  />
-                ))}
-            </View>
-            <Text style={[styles.cardText]}>
-              {card.name}
-            </Text>
-            <Text style={[styles.cardText]}>
-              {card.manaCost}
-            </Text>
-          </View>
-
-          <Text style={[styles.cardText, styles.cardTextBody]}>
-            {card.type} | {card.set.code} ({card.set.name})
-          </Text>
-          <Text style={[styles.cardText, styles.cardTextBody]}>
-            {card.text}
-            {card.power && <Text> | {card.power}/{card.toughness}</Text>}
-            {card.loyalty && "\n" + card.loyalty}
-
-          </Text>
-        </View>
-
-      </TouchableOpacity>
-    );
-  }
-}
-
 class SearchResults extends Component {
   constructor(props) {
     super(props);
@@ -486,26 +388,6 @@ const styles = StyleSheet.create({
     borderColor: "#F5FCFF",
     backgroundColor: "#F5FCFF"
   },
-  colorPickerContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  colorPickerButton: {
-    width: 35,
-    backgroundColor: "#AAAAAA",
-    borderRadius: 3,
-    fontSize: 20,
-    textAlign: "center",
-    marginHorizontal: 5
-  },
-  colorPickerButtonActive: {
-    backgroundColor: "#AAFFAA"
-  },
-  colorPickerButtonInactive: {
-    backgroundColor: "#FFAAAA"
-  }
 });
 
 AppRegistry.registerComponent("CodexShredder", () => CodexShredder);
