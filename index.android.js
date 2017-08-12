@@ -21,8 +21,9 @@ import {
   TouchableOpacity
 } from "react-native";
 
-import ColorPicker from './ColorPicker';
-import CardCard from './CardCard';
+import ColorPicker from "./ColorPicker";
+import CardCard from "./CardCard";
+import AutocompleteSuggestion from "./AutocompleteSuggestion";
 
 var cardsObj = require("./res/cards.json");
 
@@ -179,7 +180,6 @@ class CardSearch extends Component {
               callback={arg => {
                 this.setState({ colors: arg });
                 this.query(this.state.searchQuery, 0);
-                this.forceUpdate();
               }}
             />
           </View>
@@ -195,17 +195,14 @@ class CardSearch extends Component {
                 {this.state.matchingCards
                   .slice(0, 10)
                   .map((cardName, index) => (
-                    <TouchableOpacity
+                    <AutocompleteSuggestion
                       key={index}
-                      onPress={() => {
+                      cardName={cardName}
+                      callback={() => {
                         this.query(cardName, 0);
                         Keyboard.dismiss();
                       }}
-                    >
-                      <Text style={styles.cardCompleteSuggestion}>
-                        {cardName}
-                      </Text>
-                    </TouchableOpacity>
+                    />
                   ))}
               </View>}
 
@@ -327,27 +324,6 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 5
   },
-  cardCard: {
-    borderRadius: 0,
-    borderWidth: 1,
-    borderColor: "#000000",
-    margin: 3,
-    padding: 1,
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
-  cardText: {
-    fontSize: 17,
-    color: "#000000",
-    flex: 1,
-    textAlign: "center"
-  },
-  cardTextBody: {
-    margin: 0,
-    padding: 1,
-    textAlign: "left"
-  },
   cardCompleteSuggestion: {
     backgroundColor: "#AAAAFF",
     borderWidth: 1,
@@ -387,7 +363,7 @@ const styles = StyleSheet.create({
   pageNavButtonInactive: {
     borderColor: "#F5FCFF",
     backgroundColor: "#F5FCFF"
-  },
+  }
 });
 
 AppRegistry.registerComponent("CodexShredder", () => CodexShredder);
