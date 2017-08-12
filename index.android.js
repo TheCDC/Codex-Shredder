@@ -22,9 +22,9 @@ import {
 } from "react-native";
 
 import ColorPicker from "./ColorPicker";
-import CardCard from "./CardCard";
 import AutocompleteSuggestion from "./AutocompleteSuggestion";
 import ResultsNavigator from "./ResultsNavigator";
+import SearchResults from "./SearchResults";
 
 var cardsObj = require("./res/cards.json");
 
@@ -221,49 +221,6 @@ class CardSearch extends Component {
   }
 }
 
-class SearchResults extends Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    // this.state  = {responseText: "loading"};
-    const target_card = this.props.response.target_card;
-    if (
-      this.props.response.similar_cards == null ||
-      this.props.response.similar_cards === undefined
-    ) {
-      return (
-        <View>
-          <Text>
-            No similar cards.
-          </Text>
-        </View>
-      );
-    }
-    return (
-      <View>
-        <Text style={{ textAlign: "center" }}>
-          Your search
-        </Text>
-        <View style={[styles.searchedCard]}>
-          <CardCard card={target_card} />
-
-        </View>
-
-        <Text style={{ textAlign: "center" }}>
-          Tap a card to view on Scryfall. Long tap to copy/paste.
-        </Text>
-        <View>
-          {this.props.response.similar_cards.map((cardObj, index) => (
-            <CardCard card={cardObj} key={index} />
-          ))}
-
-        </View>
-      </View>
-    );
-  }
-}
-
 export default class CodexShredder extends Component {
   render() {
     return <CardSearch />;
@@ -289,9 +246,6 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 5
   },
-  searchedCard: {
-    backgroundColor: "wheat"
-  }
 });
 
 AppRegistry.registerComponent("CodexShredder", () => CodexShredder);
