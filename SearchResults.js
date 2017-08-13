@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import CardCard from "./CardCard";
 
-class SearchResults extends Component {
+export default class SearchResults extends Component {
   constructor(props) {
     super(props);
   }

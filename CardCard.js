@@ -1,5 +1,13 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Linking } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Linking,
+  Alert,
+  Clipboard
+} from "react-native";
 
 const COLORCOLORS = {
   W: "#FFF9D6",
@@ -18,7 +26,6 @@ function scryfallLink(card) {
 }
 
 const queryString = require("query-string");
-
 
 export default class CardCard extends Component {
   constructor(props) {
@@ -102,10 +109,33 @@ export default class CardCard extends Component {
               {card.manaCost}
             </Text>
           </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between"
+            }}
+          >
+            <Text style={[styles.cardText, styles.cardTextBody]}>
+              {card.supertypes && card.supertypes.join(" ")}
+              {" "}
+              {card.types.join(" ")}
+              {" "}
+              -
+              {" "}
+              {card.subtypes && card.subtypes.join(" ")}
+            </Text>
+            <Text
+              style={[
+                styles.cardText,
+                styles.cardTextBody,
+                { textAlign: "center" }
+              ]}
+            >
+              {card.set.code} ({card.set.name})
+            </Text>
 
-          <Text style={[styles.cardText, styles.cardTextBody]}>
-            {card.type} | {card.set.code} ({card.set.name})
-          </Text>
+          </View>
           <Text style={[styles.cardText, styles.cardTextBody]}>
             {card.text}
             {card.power && <Text> | {card.power}/{card.toughness}</Text>}
