@@ -76,28 +76,14 @@ export default class CardCard extends Component {
             }}
           >
 
-            <View
-              style={{
-                width: 75,
-                flexDirection: "row",
-                backgroundColor: "#DFDFDF",
-                justifyContent: "flex-start",
-                height: 15,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10
-              }}
-            >
+            <View style={styles.cardTopRow}>
               {card.colorIdentity &&
                 card.colorIdentity.map((item, index) => (
                   <View
-                    style={{
-                      width: 15,
-                      height: 15,
-                      backgroundColor: COLORCOLORS[item],
-                      borderRadius: 10,
-                      borderColor: "#000000",
-                      borderWidth: 1
-                    }}
+                    style={[
+                      styles.colorDot,
+                      { backgroundColor: COLORCOLORS[item] }
+                    ]}
                     key={index}
                   />
                 ))}
@@ -120,10 +106,8 @@ export default class CardCard extends Component {
               {card.supertypes && card.supertypes.join(" ")}
               {" "}
               {card.types.join(" ")}
-              {" "}
-              -
-              {" "}
-              {card.subtypes && card.subtypes.join(" ")}
+
+              {card.subtypes && " - " + card.subtypes.join(" ")}
             </Text>
             <Text
               style={[
@@ -159,6 +143,22 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between"
+  },
+  cardTopRow: {
+    width: 75,
+    flexDirection: "row",
+    backgroundColor: "#DFDFDF",
+    justifyContent: "flex-start",
+    height: 15,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
+  },
+  colorDot: {
+    width: 15,
+    height: 15,
+    borderRadius: 10,
+    borderColor: "#000000",
+    borderWidth: 1
   },
   cardText: {
     fontSize: 17,
