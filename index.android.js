@@ -21,15 +21,12 @@ import {
   TouchableOpacity
 } from "react-native";
 
-var cardsObj = require("./res/cards.json");
+import ColorPicker from "./ColorPicker";
+import AutocompleteSuggestion from "./AutocompleteSuggestion";
+import ResultsNavigator from "./ResultsNavigator";
+import SearchResults from "./SearchResults";
 
-function scryfallLink(card) {
-  let url =
-    "http://scryfall.com/search?" +
-    queryString.stringify({ q: card.name + " mana:" }) +
-    card.manaCost;
-  return url;
-}
+var cardsObj = require("./res/cards.json");
 
 const queryString = require("query-string");
 
@@ -48,41 +45,6 @@ class Banner extends Component {
         <Text style={styles.welcome}>
           Codex Shredder
         </Text>
-      </View>
-    );
-  }
-}
-
-class ColorPicker extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      callback: props.callback,
-      colors: [true, true, true, true, true]
-    };
-  }
-  render() {
-    return (
-      <View style={styles.colorPickerContainer}>
-        {COLORS.map((item, index) => (
-          <Text
-            onPress={() => {
-              let newcolors = this.state.colors;
-              newcolors[index] = !newcolors[index];
-              this.forceUpdate();
-              this.state.callback(newcolors);
-              this.setState({ colors: newcolors });
-            }}
-            key={index}
-            style={
-              this.state.colors[index]
-                ? [styles.colorPickerButton, styles.colorPickerButtonActive]
-                : [styles.colorPickerButton, styles.colorPickerButtonInactive]
-            }
-          >
-            {item}
-          </Text>
-        ))}
       </View>
     );
   }
@@ -182,6 +144,7 @@ class CardSearch extends Component {
       });
   }
   render() {
+    let matchingCards = this.state.matchingCards.slice(0, 10);
     if (this.state.cardList.length === 0) {
       return (
         <View>
@@ -199,6 +162,7 @@ class CardSearch extends Component {
             onChangeText={text => {
               this.setState({ searchText: text });
               this.query(text, 0);
+              this.forceUpdate();
             }}
             placeholder="Search by card name"
             onSubmitEditing={Keyboard.dismiss}
@@ -211,34 +175,26 @@ class CardSearch extends Component {
               callback={arg => {
                 this.setState({ colors: arg });
                 this.query(this.state.searchQuery, 0);
-                this.forceUpdate();
               }}
             />
           </View>
           <View>
             {this.state.searchQuery.length > 0 &&
-              this.state.matchingCards.length > 0 &&
-              this.state.matchingCards[0] !== this.state.searchQuery &&
+              matchingCards.length > 0 &&
               <View>
                 <Text>
                   Suggestions
                 </Text>
-
-                {this.state.matchingCards
-                  .slice(0, 10)
-                  .map((cardName, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => {
-                        this.query(cardName, 0);
-                        Keyboard.dismiss();
-                      }}
-                    >
-                      <Text style={styles.cardCompleteSuggestion}>
-                        {cardName}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                {matchingCards.map((name, index) => (
+                  <AutocompleteSuggestion
+                    key={name}
+                    cardName={name}
+                    callback={() => {
+                      this.query(name, 0);
+                      Keyboard.dismiss();
+                    }}
+                  />
+                ))}
               </View>}
 
           </View>
@@ -249,185 +205,17 @@ class CardSearch extends Component {
               this.state.response.similar_cards !== undefined) &&
             <View>
               <SearchResults response={this.state.response} />
-              <View style={styles.cardSearchNavbar}>
-                {this.state.page > 1
-                  ? <TouchableOpacity
-                      onPress={() =>
-                        this.query(this.state.searchQuery, this.state.page - 2)}
-                    >
-                      <Text
-                        style={[styles.pageNavButton, styles.navButtonText]}
-                      >
-                        {this.state.page - 1}
-                      </Text>
-                    </TouchableOpacity>
-                  : <Text
-                      style={[
-                        styles.pageNavButton,
-                        styles.pageNavButtonInactive,
-                        styles.navButtonText
-                      ]}
-                    />}
-                <Text style={[styles.navButtonText]}>
-                  {this.state.page}
-                </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.query(this.state.searchQuery, this.state.page)}
-                >
-
-                  <Text style={[styles.pageNavButton, styles.navButtonText]}>
-
-                    {this.state.page + 1}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <ResultsNavigator
+                page={this.state.page}
+                previousCallback={() =>
+                  this.query(this.state.searchQuery, this.state.page - 2)}
+                nextCallback={() =>
+                  this.query(this.state.searchQuery, this.state.page)}
+              />
             </View>}
           {this.state.searchIsLoaded == false &&
             <ActivityIndicator size="large" />}
         </ScrollView>
-      </View>
-    );
-  }
-}
-
-class CardCard extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  copyCardDialog(card) {
-    Alert.alert("Copy " + card.name, "Copy full card name or full text", [
-      {
-        text: "Name",
-        onPress: () => {
-          Clipboard.setString(card.name);
-        }
-      },
-      {
-        text: "Text",
-        onPress: () => {
-          Clipboard.setString(
-            [
-              card.name,
-              card.manaCost,
-              card.type,
-              card.set.code + "(" + card.set.name + ")",
-              card.text,
-              card.power && card.power + "/" + card.toughness,
-              card.loyalty
-            ].join("\n")
-          );
-        }
-      }
-    ]);
-  }
-
-  render() {
-    const card = this.props.card;
-    return (
-      <TouchableOpacity
-        onPress={() => Linking.openURL(scryfallLink(card))}
-        onLongPress={() => this.copyCardDialog(card)}
-        style={styles.cardCard}
-      >
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between"
-            }}
-          >
-
-            <View
-              style={{
-                width: 75,
-                flexDirection: "row",
-                backgroundColor: "#DFDFDF",
-                justifyContent: "flex-start",
-                height: 15,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10
-              }}
-            >
-              {card.colorIdentity &&
-                card.colorIdentity.map((item, index) => (
-                  <View
-                    style={{
-                      width: 15,
-                      height: 15,
-                      backgroundColor: COLORCOLORS[item],
-                      borderRadius: 10,
-                      borderColor: "#000000",
-                      borderWidth: 1
-                    }}
-                    key={index}
-                  />
-                ))}
-            </View>
-            <Text style={[styles.cardText]}>
-              {card.name}
-            </Text>
-            <Text style={[styles.cardText]}>
-              {card.manaCost}
-            </Text>
-          </View>
-
-          <Text style={[styles.cardText, styles.cardTextBody]}>
-            {card.type} | {card.set.code} ({card.set.name})
-          </Text>
-          <Text style={[styles.cardText, styles.cardTextBody]}>
-            {card.text}
-            {card.power && <Text> | {card.power}/{card.toughness}</Text>}
-            {card.loyalty && "\n" + card.loyalty}
-
-          </Text>
-        </View>
-
-      </TouchableOpacity>
-    );
-  }
-}
-
-class SearchResults extends Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    // this.state  = {responseText: "loading"};
-    const target_card = this.props.response.target_card;
-    if (
-      this.props.response.similar_cards == null ||
-      this.props.response.similar_cards === undefined
-    ) {
-      return (
-        <View>
-          <Text>
-            No similar cards.
-          </Text>
-        </View>
-      );
-    }
-    return (
-      <View>
-        <Text style={{ textAlign: "center" }}>
-          Your search
-        </Text>
-        <View style={[styles.searchedCard]}>
-          <CardCard card={target_card} />
-
-        </View>
-
-        <Text style={{ textAlign: "center" }}>
-          Tap a card to view on Scryfall. Long tap to copy/paste.
-        </Text>
-        <View>
-          {this.props.response.similar_cards.map((cardObj, index) => (
-            <CardCard card={cardObj} key={index} />
-          ))}
-
-        </View>
       </View>
     );
   }
@@ -458,87 +246,6 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 5
   },
-  cardCard: {
-    borderRadius: 0,
-    borderWidth: 1,
-    borderColor: "#000000",
-    margin: 3,
-    padding: 1,
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
-  cardText: {
-    fontSize: 17,
-    color: "#000000",
-    flex: 1,
-    textAlign: "center"
-  },
-  cardTextBody: {
-    margin: 0,
-    padding: 1,
-    textAlign: "left"
-  },
-  cardCompleteSuggestion: {
-    backgroundColor: "#AAAAFF",
-    borderWidth: 1,
-    borderRadius: 7,
-    borderColor: "#AAAAFF",
-    color: "#000000",
-    margin: 1,
-    fontSize: 17,
-    paddingHorizontal: 3
-  },
-  searchedCard: {
-    backgroundColor: "wheat"
-  },
-  cardSearchNavbar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  pageNavButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#000000",
-    borderWidth: 1,
-    borderColor: "#41d9f4",
-    borderRadius: 7,
-    textAlign: "center",
-    backgroundColor: "#41d9f4",
-    textAlignVertical: "center",
-    margin: 5
-  },
-  navButtonText: {
-    fontSize: 30
-  },
-  pageNavButtonInactive: {
-    borderColor: "#F5FCFF",
-    backgroundColor: "#F5FCFF"
-  },
-  colorPickerContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  colorPickerButton: {
-    width: 35,
-    backgroundColor: "#AAAAAA",
-    borderRadius: 3,
-    fontSize: 20,
-    textAlign: "center",
-    marginHorizontal: 5
-  },
-  colorPickerButtonActive: {
-    backgroundColor: "#AAFFAA"
-  },
-  colorPickerButtonInactive: {
-    backgroundColor: "#FFAAAA"
-  }
 });
 
 AppRegistry.registerComponent("CodexShredder", () => CodexShredder);
